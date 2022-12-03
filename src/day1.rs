@@ -22,8 +22,6 @@ pub fn read_elf_calories(reader: &mut dyn BufRead) -> Vec<u32> {
         elf_calorie_vector.push(calorie_accumulator);
     }
 
-    let l = elf_calorie_vector.len();
-    println!("vector len: {l}");
     return elf_calorie_vector;
 }
 
