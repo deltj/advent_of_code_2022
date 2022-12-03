@@ -35,6 +35,19 @@ pub fn max_calories(elf_calorie_vector: &Vec<u32>) -> u32 {
     return *max_calories;
 }
 
+pub fn top_three_calories(elf_calorie_vector: &mut Vec<u32>) -> (u32, u32, u32) {
+
+    //  Sort the calorie vector, descending
+    elf_calorie_vector.sort_unstable();
+    elf_calorie_vector.reverse();
+
+    let elf1 = if elf_calorie_vector.len() >= 1 { elf_calorie_vector[0] } else { 0 };
+    let elf2 = if elf_calorie_vector.len() >= 2 { elf_calorie_vector[1] } else { 0 };
+    let elf3 = if elf_calorie_vector.len() >= 3 { elf_calorie_vector[2] } else { 0 };
+
+    return (elf1, elf2, elf3);
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -88,5 +101,31 @@ mod tests {
         let max = max_calories(&elf_calorie_vector);
 
         assert_eq!(3000, max);
+    }
+
+    #[test]
+    fn three_elves() {
+        let input =
+            "1000
+            
+            2000
+            
+            3000";
+        let mut buf = input.as_bytes();
+        let mut elf_calorie_vector = read_elf_calories(&mut buf);
+
+        assert_eq!(3, elf_calorie_vector.len());
+        assert_eq!(1000, elf_calorie_vector[0]);
+        assert_eq!(2000, elf_calorie_vector[1]);
+        assert_eq!(3000, elf_calorie_vector[2]);
+
+        let max = max_calories(&elf_calorie_vector);
+
+        assert_eq!(3000, max);
+
+        let top = top_three_calories(&mut elf_calorie_vector);
+        assert_eq!(3000, top.0);
+        assert_eq!(2000, top.1);
+        assert_eq!(1000, top.2);
     }
 }
