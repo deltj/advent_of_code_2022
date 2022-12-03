@@ -18,5 +18,5 @@ fn day2_part1_actual() {
     let mut reader = BufReader::new(f);
     let strategy_vector = read_strategy_vector(&mut reader);
     let score = total_score(&strategy_vector);
-    assert_eq!(15, score);
+    assert_eq!(13009, score);
 }
