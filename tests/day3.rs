@@ -20,3 +20,21 @@ fn day3_part1_actual() {
     let sum = error_priority_sum(&rucksack_vector);
     assert_eq!(7568, sum);
 }
+
+#[test]
+fn day3_part2_example() {
+    let f = File::open("data/day3_example.txt").unwrap();
+    let mut reader = BufReader::new(f);
+    let rucksack_vector = read_rucksack_vector(&mut reader);
+    let sum = badge_priority_sum(&rucksack_vector);
+    assert_eq!(70, sum);
+}
+
+#[test]
+fn day3_part2_actual() {
+    let f = File::open("data/day3_actual.txt").unwrap();
+    let mut reader = BufReader::new(f);
+    let rucksack_vector = read_rucksack_vector(&mut reader);
+    let sum = badge_priority_sum(&rucksack_vector);
+    assert_eq!(2780, sum);
+}
