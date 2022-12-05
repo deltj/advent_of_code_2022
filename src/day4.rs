@@ -47,6 +47,11 @@ fn sequence_contains(s1: (u32,u32), s2: (u32,u32)) -> bool {
     (s1.0 <= s2.0 && s1.1 >= s2.1) || (s2.0 <= s1.0 && s2.1 >= s1.1)
 }
 
+/// Test whether one of the specified sequences overlaps the other
+fn sequence_overlaps(s1: (u32,u32), s2: (u32,u32)) -> bool {
+    (s1.1 >= s2.0 && s1.0 <= s2.0) || (s2.1 >= s1.0 && s2.0 <= s1.0)
+}
+
 /// Count the number of sequence pairs with containment
 /// (where one sequence in the pair contains the other)
 pub fn count_contained_pairs(seq_pair_vector: &Vec<SequencePair>) -> u32 {
@@ -54,6 +59,20 @@ pub fn count_contained_pairs(seq_pair_vector: &Vec<SequencePair>) -> u32 {
 
     for pair in seq_pair_vector {
         if sequence_contains(pair.s1, pair.s2) {
+            count += 1;
+        }
+    }
+
+    return count;
+}
+
+/// Count the number of sequence pairs with overlap
+/// (where one sequence in the pair overlaps the other)
+pub fn count_overlapped_pairs(seq_pair_vector: &Vec<SequencePair>) -> u32 {
+    let mut count = 0;
+
+    for pair in seq_pair_vector {
+        if sequence_overlaps(pair.s1, pair.s2) {
             count += 1;
         }
     }
@@ -100,10 +119,18 @@ mod tests {
     }
 
     #[test]
-    fn sequence_contains_test1() {
+    fn sequence_contains_test() {
         assert!( sequence_contains((2,8), (3,7)));
         assert!( sequence_contains((6,6), (4,6)));
         assert!(!sequence_contains((2,4), (6,8)));
+    }
+
+    #[test]
+    fn sequence_overlaps_test() {
+        assert!( sequence_overlaps((5,7), (7,9)));
+        assert!( sequence_overlaps((2,8), (3,7)));
+        assert!( sequence_overlaps((2,6), (4,8)));
+        assert!(!sequence_overlaps((2,3), (4,5)));
     }
 
 }
