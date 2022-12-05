@@ -6,6 +6,8 @@ pub struct StackMove {
     dst: usize,
     count: usize,
 }
+
+/// Read initial stack configuration and vector of moves from the input
 pub fn read_stacks_and_procedure(reader: &mut dyn BufRead) -> (Vec<VecDeque<char>>, Vec<StackMove>) {
     let mut stack_vector: Vec<VecDeque<char>> = Vec::new();
     let mut move_vector: Vec<StackMove> = Vec::new();
@@ -49,6 +51,7 @@ pub fn read_stacks_and_procedure(reader: &mut dyn BufRead) -> (Vec<VecDeque<char
     return (stack_vector, move_vector);
 }
 
+/// Process a move using the part 1 method
 fn process_move(stacks: &mut Vec<VecDeque<char>>, m: &StackMove) {
     for _c in 0..m.count {
         let tmp = stacks[m.src].pop_back().unwrap();
@@ -56,12 +59,35 @@ fn process_move(stacks: &mut Vec<VecDeque<char>>, m: &StackMove) {
     }
 }
 
+/// Process a move using the part 2 method
+fn process_move2(stacks: &mut Vec<VecDeque<char>>, m: &StackMove) {
+    let mut tmpvec: VecDeque<char> = VecDeque::new();
+
+    for _c in 0..m.count {
+        let tmp = stacks[m.src].pop_back().unwrap();
+        tmpvec.push_front(tmp);
+    }
+
+    for c in tmpvec {
+        stacks[m.dst].push_back(c);
+    }
+}
+
+/// Process all moves using the part 1 method
 pub fn process_moves(stacks: &mut Vec<VecDeque<char>>, moves: &Vec<StackMove>) {
     for m in moves {
         process_move(stacks, &m);
     }
 }
 
+/// Process all moves using the part 2 method
+pub fn process_moves2(stacks: &mut Vec<VecDeque<char>>, moves: &Vec<StackMove>) {
+    for m in moves {
+        process_move2(stacks, &m);
+    }
+}
+
+/// Make a string from the characters at the top of each stack
 pub fn top_crate_str(stacks: &Vec<VecDeque<char>>) -> String {
     let mut s: String = String::from("");
 
@@ -150,6 +176,83 @@ mod tests {
         assert_eq!('Z', stacks[2][3]);
         assert_eq!('N', stacks[2][2]);
         assert_eq!('D', stacks[2][1]);
+        assert_eq!('P', stacks[2][0]);
+
+    }
+
+    #[test]
+    fn read_stacks_and_procedure_test2() {
+        let input = concat!("    [D]    \n",
+                            "[N] [C]    \n",
+                            "[Z] [M] [P]\n",
+                            " 1   2   3 \n",
+                            "           \n",
+                            "move 1 from 2 to 1\n",
+                            "move 3 from 1 to 3\n",
+                            "move 2 from 2 to 1\n",
+                            "move 1 from 1 to 2\n");
+        let mut buf = input.as_bytes();
+        let (mut stacks, moves) = read_stacks_and_procedure(&mut buf);
+        assert_eq!(3, stacks.len());
+
+        assert_eq!(2, stacks[0].len());
+        assert_eq!('N', stacks[0][1]);
+        assert_eq!('Z', stacks[0][0]);
+
+        assert_eq!(3, stacks[1].len());
+        assert_eq!('D', stacks[1][2]);
+        assert_eq!('C', stacks[1][1]);
+        assert_eq!('M', stacks[1][0]);
+
+        assert_eq!(1, stacks[2].len());
+        assert_eq!('P', stacks[2][0]);
+
+        assert_eq!(4, moves.len());
+        assert_eq!(StackMove{ src: 1, dst: 0, count: 1 }, moves[0]);
+        assert_eq!(StackMove{ src: 0, dst: 2, count: 3 }, moves[1]);
+        assert_eq!(StackMove{ src: 1, dst: 0, count: 2 }, moves[2]);
+        assert_eq!(StackMove{ src: 0, dst: 1, count: 1 }, moves[3]);
+
+        process_move2(&mut stacks, &moves[0]);
+
+        //  Expected stacks after move:
+        // [D]        
+        // [N] [C]    
+        // [Z] [M] [P]
+        //  1   2   3 
+        assert_eq!(3, stacks[0].len());
+        assert_eq!('D', stacks[0][2]);
+        assert_eq!('N', stacks[0][1]);
+        assert_eq!('Z', stacks[0][0]);
+
+        assert_eq!(2, stacks[1].len());
+        assert_eq!('C', stacks[1][1]);
+        assert_eq!('M', stacks[1][0]);
+
+        assert_eq!(1, stacks[2].len());
+        assert_eq!('P', stacks[2][0]);
+
+        let top = top_crate_str(&stacks);
+        assert_eq!("DCP", top);
+
+        process_move2(&mut stacks, &moves[1]);
+
+        //  Expected stacks after move:
+        //         [D]
+        //         [N]
+        //     [C] [Z]
+        //     [M] [P]
+        //  1   2   3
+        assert_eq!(0, stacks[0].len());
+
+        assert_eq!(2, stacks[1].len());
+        assert_eq!('C', stacks[1][1]);
+        assert_eq!('M', stacks[1][0]);
+
+        assert_eq!(4, stacks[2].len());
+        assert_eq!('D', stacks[2][3]);
+        assert_eq!('N', stacks[2][2]);
+        assert_eq!('Z', stacks[2][1]);
         assert_eq!('P', stacks[2][0]);
 
     }
