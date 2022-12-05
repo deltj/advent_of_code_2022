@@ -92,7 +92,6 @@ pub fn badge_priority_sum(rucksack_vector: &Vec<String>) -> u32 {
     }
 
     let m = n / 3;  // m=number of groups
-    println!("m={m}");
 
     for i in 0..m {
         // Find the badge for this group
