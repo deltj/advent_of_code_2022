@@ -18,8 +18,11 @@ pub fn find_sop(s: &str, d: usize) -> usize {
 
                 if c1 == c2 {
                     dup = true;
+                    break;
                 }
             }
+
+            if dup { break; }
         }
 
         if !dup {
