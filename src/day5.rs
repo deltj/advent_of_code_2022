@@ -99,8 +99,6 @@ pub fn top_crate_str(stacks: &Vec<VecDeque<char>>) -> String {
 
 #[cfg(test)]
 mod tests {
-    use std::{fs::read};
-
     use super::*;
 
     #[test]
