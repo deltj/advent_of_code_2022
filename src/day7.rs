@@ -11,7 +11,7 @@ pub struct TreeNode {
     children: Vec<Rc<RefCell<TreeNode>>>,
     parent: Option<Rc<RefCell<TreeNode>>>,
     name: String,
-    size: usize,
+    pub size: usize,
 }
 
 pub fn update_sizes(node: Rc<RefCell<TreeNode>>) -> usize {
@@ -48,7 +48,6 @@ pub fn sum_dirs_le(fs: Rc<RefCell<TreeNode>>, max_size: usize) -> usize {
     let mut dir_sizes: Vec<usize> = Vec::new();
     let mut callback = |node: Rc<RefCell<TreeNode>>| {
         let rm = node.borrow_mut();
-        println!("visiting {0}", rm.name);
         if rm.node_type == NodeType::Directory {
             dir_sizes.push(rm.size);
         }
@@ -58,11 +57,24 @@ pub fn sum_dirs_le(fs: Rc<RefCell<TreeNode>>, max_size: usize) -> usize {
     let mut total_size = 0;
     for dir_size in dir_sizes {
         if dir_size < max_size {
-            println!("{dir_size} is less than {max_size}");
             total_size += dir_size;
         }
     }
     return total_size;
+}
+
+pub fn smallest_dir_gt(fs: Rc<RefCell<TreeNode>>, min_size: usize) -> usize {
+    let mut large_enough_dir_sizes: Vec<usize> = Vec::new();
+    let mut callback = |node: Rc<RefCell<TreeNode>>| {
+        let rm = node.borrow_mut();
+        if rm.node_type == NodeType::Directory && rm.size > min_size {
+            large_enough_dir_sizes.push(rm.size);
+        }
+    };
+    dfs(fs, &mut callback);
+
+    let min = large_enough_dir_sizes.iter().min();
+    return *min.unwrap();
 }
 
 fn new_file(file_name: &str, file_size: usize, p: Option<Rc<RefCell<TreeNode>>>) -> Rc<RefCell<TreeNode>> {
@@ -106,10 +118,6 @@ pub fn read_fs_tree(reader: &mut dyn BufRead) -> Rc<RefCell<TreeNode>> {
                     // go up to parent dir
                     let current_dir_clone = current_dir.clone();
                     current_dir = current_dir_clone.borrow().parent.as_ref().unwrap().clone();
-                    //let parent_dir_option = &current_dir.borrow().parent;
-                    //let parent_dir_ref = parent_dir_option.as_ref().unwrap();
-                    //current_dir = parent_dir_ref.clone();
-                    
                     
                     println!("changing directory to {0}", current_dir.borrow().name);
                 } else {
@@ -216,5 +224,20 @@ mod tests {
 
         let sum = sum_dirs_le(fs.clone(), 100000);
         assert_eq!(95437, sum);
+
+        let total_used_space = fs.borrow().size;
+        assert_eq!(48381165, total_used_space);
+
+        let total_available_space = 70000000;
+        let total_unused_space = total_available_space - total_used_space;
+        assert_eq!(21618835, total_unused_space);
+
+        let min_space_required = 30000000;
+        let smallest_dir_size_to_delete = min_space_required - total_unused_space;
+        assert_eq!(8381165, smallest_dir_size_to_delete);
+
+        let smallest_dir_size_greater_than_the_minimum_required = smallest_dir_gt(fs.clone(), 8381165);
+        assert_eq!(24933642, smallest_dir_size_greater_than_the_minimum_required);
+
     }
 }
