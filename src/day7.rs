@@ -1,4 +1,4 @@
-use std::{io::BufRead, rc::Rc, cell::RefCell, env::current_exe, thread::current, ops::Deref};
+use std::{io::BufRead, rc::Rc, cell::RefCell};
 
 #[derive(PartialEq)]
 pub enum NodeType {
@@ -14,27 +14,28 @@ pub struct TreeNode {
     pub size: usize,
 }
 
+/// Update the sizes of the provided node and its children.  Why didn't I use my 
+/// dfs implementation for this?
 pub fn update_sizes(node: Rc<RefCell<TreeNode>>) -> usize {
     let mut rm = node.borrow_mut();
-    println!("updating {0}", rm.name);
     match rm.node_type {
         NodeType::File => {
-            println!("size of {0} is {1}", rm.name, rm.size);
             return rm.size;
         },
         NodeType::Directory => {
-            println!("{0} is a directory", rm.name);
             let mut sz: usize = 0;
             for n in &rm.children {
                 sz += update_sizes(n.clone());
             }
-            println!("size of {0} is {sz}", rm.name);
             rm.size = sz;
             return sz;
         },
     }
 }
 
+/// Perform a depth-first search of the provided graph (tree).  The callback function
+/// will be called for each node visited, to support arbitrary operations based on the 
+/// graph structure.
 pub fn dfs(node: Rc<RefCell<TreeNode>>, callback: &mut dyn FnMut(Rc<RefCell<TreeNode>>)) {
     callback(node.clone());
 
@@ -44,6 +45,7 @@ pub fn dfs(node: Rc<RefCell<TreeNode>>, callback: &mut dyn FnMut(Rc<RefCell<Tree
     }
 }
 
+/// Use a DFS to compute a sum of directory nodes less than or equal to the specified size
 pub fn sum_dirs_le(fs: Rc<RefCell<TreeNode>>, max_size: usize) -> usize {
     let mut dir_sizes: Vec<usize> = Vec::new();
     let mut callback = |node: Rc<RefCell<TreeNode>>| {
@@ -63,6 +65,7 @@ pub fn sum_dirs_le(fs: Rc<RefCell<TreeNode>>, max_size: usize) -> usize {
     return total_size;
 }
 
+/// Use a DFS to find the smallest directory node greater than or equal to the specified size
 pub fn smallest_dir_gt(fs: Rc<RefCell<TreeNode>>, min_size: usize) -> usize {
     let mut large_enough_dir_sizes: Vec<usize> = Vec::new();
     let mut callback = |node: Rc<RefCell<TreeNode>>| {
@@ -77,6 +80,7 @@ pub fn smallest_dir_gt(fs: Rc<RefCell<TreeNode>>, min_size: usize) -> usize {
     return *min.unwrap();
 }
 
+/// Create a new TreeNode on the heap.  This may not be rust-idiomatic
 fn new_file(file_name: &str, file_size: usize, p: Option<Rc<RefCell<TreeNode>>>) -> Rc<RefCell<TreeNode>> {
     Rc::new(RefCell::new(TreeNode {
         node_type: NodeType::File,
@@ -87,6 +91,7 @@ fn new_file(file_name: &str, file_size: usize, p: Option<Rc<RefCell<TreeNode>>>)
     }))
 }
 
+/// Create a new TreeNode on the heap.  This may not be rust-idiomatic
 fn new_dir(dir_name: &str, p: Option<Rc<RefCell<TreeNode>>>) -> Rc<RefCell<TreeNode>> {
     Rc::new(RefCell::new(TreeNode {
         node_type: NodeType::Directory,
@@ -97,16 +102,16 @@ fn new_dir(dir_name: &str, p: Option<Rc<RefCell<TreeNode>>>) -> Rc<RefCell<TreeN
     }))
 }
 
+/// Read the provided commands/output into a tree structure
 pub fn read_fs_tree(reader: &mut dyn BufRead) -> Rc<RefCell<TreeNode>> {
     let root = new_dir("/", None);
 
     let mut current_dir = root.clone();
-    let mut last_dir = root.clone();
 
     for line_result in reader.lines() {
         let line = line_result.unwrap();
         let trimmed_line = line.trim();
-        println!("input line: {trimmed_line}");
+        //println!("input line: {trimmed_line}");
 
         let tok = trimmed_line.split(" ").collect::<Vec<&str>>();
 
@@ -119,7 +124,7 @@ pub fn read_fs_tree(reader: &mut dyn BufRead) -> Rc<RefCell<TreeNode>> {
                     let current_dir_clone = current_dir.clone();
                     current_dir = current_dir_clone.borrow().parent.as_ref().unwrap().clone();
                     
-                    println!("changing directory to {0}", current_dir.borrow().name);
+                    //println!("changing directory to {0}", current_dir.borrow().name);
                 } else {
                     // go to specified dir
                     let new_dir_name = tok[2];
@@ -132,9 +137,8 @@ pub fn read_fs_tree(reader: &mut dyn BufRead) -> Rc<RefCell<TreeNode>> {
                         }
                     }
 
-                    last_dir = current_dir.clone();
                     current_dir = new_dir_node;
-                    println!("changing directory to {0}", current_dir.borrow().name);
+                    //println!("changing directory to {0}", current_dir.borrow().name);
                 }
             }
         } else if trimmed_line.starts_with("dir") {
@@ -184,7 +188,7 @@ mod tests {
             5626152 d.ext
             7214296 k";
         let mut buf = input.as_bytes();
-        let mut fs = read_fs_tree(&mut buf);
+        let fs = read_fs_tree(&mut buf);
         
         assert_eq!("/", fs.borrow().name);
         assert_eq!(0, fs.borrow().size);
@@ -206,7 +210,6 @@ mod tests {
         let mut dir_sizes: Vec<usize> = Vec::new();
         let mut callback = |node: Rc<RefCell<TreeNode>>| {
             let rm = node.borrow_mut();
-            println!("visiting {0}", rm.name);
             if rm.node_type == NodeType::Directory {
                 dir_sizes.push(rm.size);
             }
