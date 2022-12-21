@@ -1,10 +1,10 @@
 use advent_of_code_2022::day8::*;
 
-use std::io::{BufReader};
+use std::io::BufReader;
 use std::fs::File;
 
 #[test]
-fn day7_part1_example() {
+fn day8_part1_example() {
     let f = File::open("data/day8_example.txt").unwrap();
     let mut reader = BufReader::new(f);
     let trees = read_tree_heights(&mut reader);
@@ -13,7 +13,7 @@ fn day7_part1_example() {
 }
 
 #[test]
-fn day7_part1_actual() {
+fn day8_part1_actual() {
     let f = File::open("data/day8_actual.txt").unwrap();
     let mut reader = BufReader::new(f);
     let trees = read_tree_heights(&mut reader);
@@ -22,7 +22,7 @@ fn day7_part1_actual() {
 }
 
 #[test]
-fn day7_part2_example() {
+fn day8_part2_example() {
     let f = File::open("data/day8_example.txt").unwrap();
     let mut reader = BufReader::new(f);
     let trees = read_tree_heights(&mut reader);
@@ -31,7 +31,7 @@ fn day7_part2_example() {
 }
 
 #[test]
-fn day7_part2_actual() {
+fn day8_part2_actual() {
     let f = File::open("data/day8_actual.txt").unwrap();
     let mut reader = BufReader::new(f);
     let trees = read_tree_heights(&mut reader);
