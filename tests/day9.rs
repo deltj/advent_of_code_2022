@@ -9,10 +9,11 @@ fn day9_part1_example() {
     let f = File::open("data/day9_example.txt").unwrap();
     let mut reader = BufReader::new(f);
     let movements = read_movements(&mut reader);
-    let mut head_pos = (0, 0);
-    let mut tail_pos = (0, 0);
-    let mut history: HashSet<(i32, i32)> = HashSet::new();
-    process_movements(&mut head_pos, &mut tail_pos, &movements, &mut history);
+
+    let mut rope: Rope = Rope::new(2);
+
+    let mut history: HashSet<RopeVertex> = HashSet::new();
+    process_movements(&mut rope, &movements, &mut history);
     
     let visited_positions = history.len();
     assert_eq!(13, visited_positions);
@@ -23,10 +24,11 @@ fn day9_part1_actual() {
     let f = File::open("data/day9_actual.txt").unwrap();
     let mut reader = BufReader::new(f);
     let movements = read_movements(&mut reader);
-    let mut head_pos = (0, 0);
-    let mut tail_pos = (0, 0);
-    let mut history: HashSet<(i32, i32)> = HashSet::new();
-    process_movements(&mut head_pos, &mut tail_pos, &movements, &mut history);
+
+    let mut rope: Rope = Rope::new(2);
+
+    let mut history: HashSet<RopeVertex> = HashSet::new();
+    process_movements(&mut rope, &movements, &mut history);
     
     let visited_positions = history.len();
     assert_eq!(6030, visited_positions);
@@ -34,12 +36,30 @@ fn day9_part1_actual() {
 
 #[test]
 fn day9_part2_example() {
-    let f = File::open("data/day8_example.txt").unwrap();
-    let mut _reader = BufReader::new(f);
+    let f = File::open("data/day9_example.txt").unwrap();
+    let mut reader = BufReader::new(f);
+    let movements = read_movements(&mut reader);
+
+    let mut rope: Rope = Rope::new(10);
+
+    let mut history: HashSet<RopeVertex> = HashSet::new();
+    process_movements(&mut rope, &movements, &mut history);
+    
+    let visited_positions = history.len();
+    assert_eq!(1, visited_positions);
 }
 
 #[test]
 fn day9_part2_actual() {
     let f = File::open("data/day9_actual.txt").unwrap();
-    let mut _reader = BufReader::new(f);
+    let mut reader = BufReader::new(f);
+    let movements = read_movements(&mut reader);
+
+    let mut rope: Rope = Rope::new(10);
+
+    let mut history: HashSet<RopeVertex> = HashSet::new();
+    process_movements(&mut rope, &movements, &mut history);
+    
+    let visited_positions = history.len();
+    assert_eq!(2545, visited_positions);
 }
