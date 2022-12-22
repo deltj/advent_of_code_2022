@@ -24,6 +24,13 @@ impl FakeComputer {
         Self { cycle: 1, ip: 0, ic: 0, x: 1, program }
     }
 
+    pub fn reset(&mut self) {
+        self.cycle = 1;
+        self.ip = 0;
+        self.ic = 0;
+        self.x = 1;
+    } 
+
     pub fn run(&mut self, count: i32) {
         //println!("running for {count} cycles");
         let end_cycle = self.cycle + count;
@@ -55,6 +62,23 @@ impl FakeComputer {
 
     pub fn get_signal_strength(&self) -> i32 {
         self.cycle * self.x
+    }
+
+    pub fn render_display(&mut self) {
+        while self.cycle <= 240 {
+            let c = (self.cycle - 1) % 40;
+            if c == 0 {
+                println!("");
+            }
+
+            if ((c - 1) <= self.x) && (self.x <= (c + 1)) {
+                print!("#");
+            } else {
+                print!(".");
+            }
+            
+            self.run(1);
+        }
     }
 }
 

@@ -81,11 +81,19 @@ fn day10_part1_actual() {
 #[test]
 fn day10_part2_example() {
     let f = File::open("data/day10_example.txt").unwrap();
-    let mut _reader = BufReader::new(f);
+    let mut reader = BufReader::new(f);
+    let program = read_program(&mut reader);
+    let mut cpu = FakeComputer::new(program);
+    cpu.reset();
+    //cpu.render_display();
 }
 
 #[test]
 fn day10_part2_actual() {
     let f = File::open("data/day10_actual.txt").unwrap();
-    let mut _reader = BufReader::new(f);
+    let mut reader = BufReader::new(f);
+    let program = read_program(&mut reader);
+    let mut cpu = FakeComputer::new(program);
+    cpu.reset();
+    //cpu.render_display();
 }
